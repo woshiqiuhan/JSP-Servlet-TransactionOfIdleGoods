@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace属性是名称空间，必须唯一 -->
+<mapper namespace="com.hznu.dao.IdleGoodsDao">
+    <!--使用insert、update、dalete、select标签写sql语句-->
+    <resultMap id="idleGoodsMap" type="com.hznu.domain.IdleGoods">
+        <id column="goods_id" property="goodsId"/>
+
+        <result column="user_id" property="userId"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="goods_tags" property="goodsTags"/>
+        <result column="goods_name" property="goodsName"/>
+        <result column="goods_detail" property="goodsDetail"/>
+        <result column="goods_price" property="goodsPrice"/>
+        <result column="goods_status" property="goodsStatus"/>
+        <result column="goods_create_date" property="goodsCreateDate"/>
+        <result column="message_num" property="messageNum"/>
+        <result column="goods_province" property="goodsProvince"/>
+        <result column="goods_cover_img_dir" property="goodsCoverImgDir"/>
+        <result column="order_id" property="orderId"/>
+        <result column="order_status" property="orderStatus"/>
+
+        <association property="user" javaType="com.hznu.domain.User">
+            <id column="user_id" property="userId"/>
+
+            <result column="user_login_id" property="userLoginId" javaType="java.lang.String" jdbcType="CHAR"/>
+            <result column="user_role" property="userRole"/>
+            <result column="user_name" property="userName"/>
+            <result column="user_password" property="userPassword"/>
+            <result column="user_phone_num" property="userPhoneNum"/>
+            <result column="user_email" property="userEmail"/>
+            <result column="user_register_date" property="userRegisterDate"/>
+            <result column="user_status" property="userStatus"/>
+
+        </association>
+
+
+    </resultMap>
+
+    <select id="selectAllFromIdleGood" resultMap="idleGoodsMap">
+        select * from idle_goods
+    </select>
+
+    <insert id="insertNewIdleGoods">
+        insert into idle_goods (goods_id, user_id, category_id, goods_tags, goods_name, goods_detail, goods_price, goods_status, goods_province, goods_cover_img_dir)
+        values (#{goodsId}, #{userId}, #{categoryId}, #{goodsTags}, #{goodsName}, #{goodsDetail}, #{goodsPrice}, #{goodsStatus}, #{goodsProvince}, #{goodsCoverImgDir})
+    </insert>
+
+    <select id="selectIdleGoodsInfo" resultMap="idleGoodsMap">
+        select goods_id, goods_name, user_name, goods_price, goods_province, goods_cover_img_dir, goods_status
+        from user natural join idle_goods
+        order by goods_status asc
+    </select>
+
+    <select id="selectIdleGoodsInfoByUserId" resultMap="idleGoodsMap">
+        select goods_id, goods_name, user_name, goods_price, goods_province, goods_cover_img_dir, goods_status
+        from user natural join idle_goods
+        where user_id = #{userId}
+        order by goods_status asc
+    </select>
+
+    <!--查找用户的浏览记录并降序排列-->
+    <select id="selectUserBrowseHistory" resultMap="idleGoodsMap">
+        select ig.goods_id, goods_name, user.user_name, goods_price, goods_province, goods_cover_img_dir, goods_status
+        from idle_goods ig natural join user, user_browse_history ubh
+        where ig.goods_id = ubh.goods_id and ubh.user_id = #{userId}
+        order by goods_status asc, ubh.browse_time desc
+    </select>
+
+    <!--查找用户收藏的闲置品并降序排列-->
+    <select id="selectUserCollect" resultMap="idleGoodsMap">
+        select ig.goods_id, goods_name, user.user_name, goods_price, goods_province, goods_cover_img_dir, goods_status
+        from idle_goods ig natural join user, user_browse_history ubh
+        where ig.goods_id = ubh.goods_id and ubh.user_id = #{userId} and ubh.status = 1
+        order by goods_status asc, ubh.browse_time desc
+    </select>
+
+    <select id="selectIdleGoodsInfoById" resultMap="idleGoodsMap">
+        select *
+        from user natural join idle_goods
+        where goods_id = #{goodsId}
+    </select>
+
+    <select id="selectIdleGoodsDetailInfoById" resultMap="idleGoodsMap">
+        select *
+        from user natural join idle_goods
+        where goods_id = #{goodsId}
+    </select>
+
+    <select id="selectSizeOfIdleGoods" resultType="int">
+         select count(*) from idle_goods
+     </select>
+
+    <select id="selectSizeOfIdleGoodsByUserId" resultType="int">
+         select count(*) from idle_goods
+         where user_id = #{userId}
+     </select>
+
+    <update id="updateIdleGoodsStatus">
+        update idle_goods set goods_status = #{goodsStatus} where goods_id = #{goodsId}
+    </update>
+
+    <select id="selectOrderIdleGoodsByUserId" resultMap="idleGoodsMap">
+        select ig.goods_id, goods_name, user.user_name, goods_price, goods_province, goods_cover_img_dir, goods_status, orders.order_status, orders.order_id
+        from idle_goods ig natural join user, orders
+        where ig.goods_id = orders.goods_id and orders.user_id = #{userId}
+        order by goods_status asc, orders.order_create_time desc
+    </select>
+
+    <select id="selectSizeOfIdleGoodsFuzzy" resultType="int">
+        select count(*) from idle_goods
+        where goods_name like #{words} or goods_tags like #{words}
+        order by goods_status asc
+    </select>
+
+    <select id="selectIdleGoodsFuzzy" resultMap="idleGoodsMap">
+        select * from idle_goods natural join userselectUserCollect
+        where goods_name like #{words} or goods_tags like #{words}
+        order by goods_status asc
+    </select>
+
+    <!--查询已卖出但并未提醒用户已卖出的闲置品-->
+    <select id="selectIdleGoodsSold" resultMap="idleGoodsMap">
+        select *
+        from idle_goods
+        where user_id = #{userId} and goods_status = 2
+    </select>
+
+    <!--查询被评价但还未提醒用户的闲置品-->
+    <select id="selectIdleGoodsRated" resultMap="idleGoodsMap">
+        select ig.goods_name, ig.goods_id
+        from idle_goods ig, message_board mb
+        where ig.goods_id = mb.goods_id and mb.message_status = 1 and ig.user_id = #{userId}
+    </select>
+
+    <!--查询已卖出但并未提醒用户已卖出的闲置品-->
+    <select id="selectIdleGoodsOrdersCancel" resultMap="idleGoodsMap">
+        select *
+        from idle_goods
+        where user_id = #{userId} and goods_status = 4
+    </select>
+</mapper>

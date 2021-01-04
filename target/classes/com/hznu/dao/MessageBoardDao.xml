@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace属性是名称空间，必须唯一 -->
+<mapper namespace="com.hznu.dao.MessageBoardDao">
+    <!--使用insert、update、dalete、select标签写sql语句-->
+
+    <resultMap id="messageBoardMap" type="com.hznu.domain.MessageBoard">
+        <id column="message_id" property="messageId"/>
+
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="leaving_date" property="leavingDate"/>
+        <result column="reply_num" property="replyNum"/>
+        <result column="message_detail" property="messageDetail"/>
+        <result column="message_status" property="messageStatus"/>
+    </resultMap>
+
+    <select id="selectAllFromMessageBoard" resultMap="messageBoardMap">
+        select * from message_board;
+    </select>
+
+    <select id="selectByGoodsId" resultMap="messageBoardMap">
+        select user_name, leaving_date, message_detail, message_id
+        from message_board natural join user
+        where goods_id = #{goodsId}
+        order by leaving_date desc
+    </select>
+
+    <insert id="insertNewMessageToBoard">
+        insert into message_board (message_id, user_id, goods_id, message_detail, message_status)
+        values (#{messageId}, #{userId}, #{goodsId}, #{messageDetail}, #{messageStatus})
+    </insert>
+
+    <update id="updateStatusAfterRemindUser">
+        update message_board set message_status = 2 where goods_id = #{goodsId}
+    </update>
+</mapper>

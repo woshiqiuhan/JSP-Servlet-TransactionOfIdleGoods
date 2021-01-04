@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace属性是名称空间，必须唯一 -->
+<mapper namespace="com.hznu.dao.UserBrowseHistoryDao">
+    <!--使用insert、update、dalete、select标签写sql语句-->
+
+    <resultMap id="userBrowseHistoryMap" type="com.hznu.domain.UserBrowseHistory">
+        <id column="browse_id" property="browseId"/>
+
+        <result column="user_id" property="userId"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="browse_time" property="browseTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <insert id="insertNewUserBrowseHistory">
+        insert into user_browse_history (browse_id, user_id, goods_id, status)
+        values (#{browseId}, #{userId}, #{goodsId}, #{status})
+    </insert>
+
+    <select id="selectAllFromUserBrowseHistory" resultMap="userBrowseHistoryMap">
+        select * from user_browse_history
+    </select>
+
+    <select id="selectCountById" resultType="int">
+         select count(*) from user_browse_history where user_id = #{userId} and goods_id = #{goodsId}
+     </select>
+
+    <select id="selectCountByUserId" resultType="int">
+         select count(*) from user_browse_history where user_id = #{userId}
+     </select>
+
+    <select id="selectCountCollectByUserId" resultType="int">
+         select count(*) from user_browse_history where user_id = #{userId} and status = 1
+     </select>
+
+    <select id="selectHistoryStatus" resultType="int">
+         select status from user_browse_history where user_id = #{userId} and goods_id = #{goodsId}
+     </select>
+
+    <update id="updateBrowseTime">
+        update user_browse_history set browse_time = CURRENT_TIMESTAMP where user_id = #{userId} and goods_id = #{goodsId}
+    </update>
+
+
+    <delete id="deleteUserColleted">
+        delete from user_browse_history where user_id = #{userId} and goods_id = #{goodsId}
+    </delete>
+</mapper>

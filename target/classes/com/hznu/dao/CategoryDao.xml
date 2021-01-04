@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace属性是名称空间，必须唯一 -->
+<mapper namespace="com.hznu.dao.CategoryDao">
+    <!--使用insert、update、dalete、select标签写sql语句-->
+
+    <resultMap id="categoryMap" type="com.hznu.domain.Category">
+        <id column="category_id" property="categoryId"/>
+
+        <result column="parent_category_id" property="parentCategoryId"/>
+        <result column="category_name" property="categoryName"/>
+    </resultMap>
+
+    <select id="selectAllFromCategory" resultMap="categoryMap">
+        select * from category
+    </select>
+
+    <select id="selectRootCategory" resultMap="categoryMap">
+        select * from category where category_id = parent_category_id
+    </select>
+
+    <select id="selectCategoryByParentCategoryId" resultMap="categoryMap">
+        select * from category where parent_category_id = #{parentCategoryId} and category_id != parent_category_id
+    </select>
+
+</mapper>

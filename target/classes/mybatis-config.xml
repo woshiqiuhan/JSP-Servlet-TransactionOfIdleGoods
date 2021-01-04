@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!--使用外部属性配置文件-->
+    <properties resource="jdbc.properties"/>
+    <!--添加日志功能-->
+    <!--<settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>-->
+
+    <!--配置插件-->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor"/>
+    </plugins>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <!--配置数据源：创建连接对象Connection对象-->
+            <dataSource type="POOLED">
+                <!--driver：驱动的内容-->
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <!--
+        指定其它mapper文件的位置：：其它mapper文件的作用是找到其它文件的sql语句
+    -->
+    <mappers>
+        <!--
+            使用mapper的resource属性指定mapper文件的路径
+                注：路径是从target/classes路径开始的
+
+            使用注意：
+                resource="mapper文件的路径(使用 / 做分隔)"
+                一个mapper resource指定一个mapper文件
+        -->
+        <mapper resource="com/hznu/dao/UserDao.xml"/>
+        <mapper resource="com/hznu/dao/CategoryDao.xml"/>
+        <mapper resource="com/hznu/dao/IdleGoodsDao.xml"/>
+        <mapper resource="com/hznu/dao/UserBrowseHistoryDao.xml"/>
+        <mapper resource="com/hznu/dao/UserDeliveryInformationDao.xml"/>
+        <mapper resource="com/hznu/dao/OrdersDao.xml"/>
+        <mapper resource="com/hznu/dao/MessageBoardDao.xml"/>
+        <mapper resource="com/hznu/dao/MessageReplyDao.xml"/>
+
+    </mappers>
+</configuration>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace属性是名称空间，必须唯一 -->
+<mapper namespace="com.hznu.dao.MessageReplyDao">
+    <!--使用insert、update、dalete、select标签写sql语句-->
+    <resultMap id="messageReplyMap" type="com.hznu.domain.MessageReply">
+        <id column="reply_id" property="replyId"/>
+
+        <result column="message_id" property="messageId"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="reply_order" property="replyOrder"/>
+        <result column="reply_date" property="replyDate"/>
+        <result column="reply_detail" property="replyDetail"/>
+        <result column="reply_status" property="replyStatus"/>
+    </resultMap>
+
+    <select id="selectAllFromMessageReply" resultMap="messageReplyMap">
+        select * from message_reply
+    </select>
+
+    <select id="selectReplyByMessageId" resultMap="messageReplyMap">
+        select user_name, reply_date, reply_detail
+        from message_reply natural join user
+        where message_id = #{messageId}
+        order by reply_date asc
+    </select>
+
+    <insert id="insertNewMessageReply">
+        insert into message_reply (reply_id, message_id, user_id, reply_detail, reply_status)
+        values (#{replyId}, #{messageId}, #{userId}, #{replyDetail}, #{replyStatus})
+    </insert>
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace属性是名称空间，必须唯一 -->
+<mapper namespace="com.hznu.dao.OrdersDao">
+    <!--使用insert、update、dalete、select标签写sql语句-->
+    <resultMap id="ordersMap" type="com.hznu.domain.Orders">
+        <id column="order_id" property="orderId"/>
+
+        <result column="user_id" property="userId"/>
+        <result column="goods_id" property="goodsId"/>
+        <result column="delivery_info_id" property="deliveryInfoId"/>
+        <result column="order_status" property="orderStatus"/>
+        <result column="order_create_time" property="orderCreateTime"/>
+        <result column="order_close_time" property="orderCloseTime"/>
+        <result column="payment_amount" property="paymentAmount"/>
+        <result column="payment_time" property="paymentTime"/>
+    </resultMap>
+
+    <select id="selectAllFromOrder" resultMap="ordersMap">
+        select * from orders
+    </select>
+
+    <insert id="insertIntoNewOrder">
+        insert into orders (order_id, user_id, goods_id, delivery_info_id, order_status)
+        values (#{orderId}, #{userId}, #{goodsId}, #{deliveryInfoId}, #{orderStatus})
+    </insert>
+
+    <!--当用户支付时更新订单状态-->
+    <update id="updateOrdersStatus">
+        update orders set order_status = #{orderStatus}, payment_time = CURRENT_TIMESTAMP, payment_amount = #{goodsPrice} where order_id = #{orderId}
+    </update>
+
+    <select id="selectOrdersByUserIdAndGoodsId" resultMap="ordersMap">
+        select * from orders
+        where user_id = #{userId} and goods_id = #{goodsId}
+    </select>
+
+    <select id="selectCountByUserId" resultType="int">
+        select count(*) from orders where user_id = #{userId}
+    </select>
+
+    <select id="selectordersByGoodsId" resultMap="ordersMap">
+        select * from orders
+        where goods_id = #{goodsId}
+    </select>
+
+    <select id="selectordersById" resultMap="ordersMap">
+        select * from orders
+        where order_id = #{orderId}
+    </select>
+
+    <!--更新订单状态-->
+    <update id="updateOrdersStatusTo">
+        update orders set order_status = #{orderStatus} where order_id = #{orderId}
+    </update>
+</mapper>
